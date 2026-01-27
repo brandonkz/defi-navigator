@@ -341,7 +341,7 @@
             </div>
 
             <div class="action-buttons">
-                <button class="btn btn-secondary btn-large" id="cancelBtn">CANCEL</button>
+                <button class="btn btn-secondary btn-large" id="cancelBtn">← HOME</button>
                 <button class="btn btn-primary btn-large" id="goNowBtn">GO NOW →</button>
             </div>
         </div>
@@ -390,18 +390,16 @@
                 url: 'https://app.orderly.network/vaults/0x70fe7d65ac7c1a1732f64d2e6fc0e33622d0c991',
                 name: 'Orderly Network Vault',
                 description: 'Decentralized trading infrastructure with automated vault strategies. Access institutional-grade liquidity and yield generation.'
-            }
+            },
             {
-                url: 'https://app.yuzu.money?ref=WTKY8ZYN',
+                url: 'https://app.yuzu.money/?ref=WTKY8ZYN',
                 name: 'Yuzu Money',
-                description: 'Decentralized lending and borrowing protocol with optimized yields. Access competitive rates and flexible terms across multiple chains.'
+                description: 'High-yield DeFi stablecoin with institutional-grade protection. Transparent, overcollateralized, and backed by curated yield strategies.'
             }
         ];
 
         let currentIndex = 0;
         let visitedSites = new Set();
-        let countdownInterval = null;
-        let redirectTimeout = null;
 
         const currentNum = document.getElementById('currentNum');
         const totalNum = document.getElementById('totalNum');
@@ -420,70 +418,22 @@
 
         totalNum.textContent = sites.length;
 
-        function clearTimers() {
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-                countdownInterval = null;
-            }
-            if (redirectTimeout) {
-                clearTimeout(redirectTimeout);
-                redirectTimeout = null;
-            }
-        }
-
-        function updateHeader(index) {
+        function updateDisplay(index) {
             const site = sites[index];
             currentNum.textContent = index + 1;
             headerName.textContent = site.name;
             headerDesc.textContent = site.description;
-        }
-
-        function startCountdown(index) {
-            clearTimers();
-            
-            const site = sites[index];
-            let count = 3;
-            
-            // Update preview
             previewName.textContent = site.name;
             previewDesc.textContent = site.description;
             previewUrl.textContent = site.url;
-            
-            countdown.textContent = count;
-            countdownText.textContent = 'Redirecting to platform...';
-            
-            countdownInterval = setInterval(() => {
-                count--;
-                countdown.textContent = count;
-                
-                if (count === 0) {
-                    clearTimers();
-                    countdown.textContent = '→';
-                    countdownText.textContent = 'Navigating now...';
-                }
-            }, 1000);
-            
-            redirectTimeout = setTimeout(() => {
-                window.location.href = site.url;
-            }, 3000);
+            countdown.textContent = '→';
+            countdownText.textContent = 'Click GO NOW to visit';
         }
 
-        function loadSite(index, autoNavigate = true) {
+        function loadSite(index) {
             currentIndex = index;
             visitedSites.add(index);
-            updateHeader(index);
-            
-            if (autoNavigate) {
-                startCountdown(index);
-            } else {
-                clearTimers();
-                const site = sites[index];
-                previewName.textContent = site.name;
-                previewDesc.textContent = site.description;
-                previewUrl.textContent = site.url;
-                countdown.textContent = '—';
-                countdownText.textContent = 'Ready when you are';
-            }
+            updateDisplay(index);
         }
 
         function getRandomIndex() {
@@ -501,28 +451,21 @@
 
         function stumble() {
             const randomIndex = getRandomIndex();
-            loadSite(randomIndex, true);
+            loadSite(randomIndex);
         }
 
         function nextSite() {
             const nextIndex = (currentIndex + 1) % sites.length;
-            loadSite(nextIndex, false);
+            loadSite(nextIndex);
         }
 
         function prevSite() {
             const prevIndex = (currentIndex - 1 + sites.length) % sites.length;
-            loadSite(prevIndex, false);
+            loadSite(prevIndex);
         }
 
         function goNow() {
-            clearTimers();
             window.location.href = sites[currentIndex].url;
-        }
-
-        function cancel() {
-            clearTimers();
-            countdown.textContent = '—';
-            countdownText.textContent = 'Navigation cancelled';
         }
 
         // Event listeners
@@ -530,7 +473,9 @@
         nextBtn.addEventListener('click', nextSite);
         prevBtn.addEventListener('click', prevSite);
         goNowBtn.addEventListener('click', goNow);
-        cancelBtn.addEventListener('click', cancel);
+        cancelBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
@@ -548,12 +493,12 @@
                 goNow();
             } else if (e.key === 'Escape') {
                 e.preventDefault();
-                cancel();
+                window.location.href = 'index.html';
             }
         });
 
-        // Initialize - load first site without auto-navigate
-        loadSite(0, false);
+        // Initialize - load first site
+        loadSite(0);
     </script>
 </body>
 </html>
