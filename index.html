@@ -4,15 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DeFi Navigator - Home</title>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-V8CVQMQ5FM"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-V8CVQMQ5FM');
-</script>
     <style>
         * {
             margin: 0;
@@ -149,6 +140,112 @@
             width: 100%;
         }
 
+        .featured-section {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 40px;
+            margin-bottom: 80px;
+        }
+
+        .featured-badge {
+            display: inline-block;
+            background: #ffffff;
+            color: #000000;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+        }
+
+        .featured-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .featured-info h2 {
+            color: #ffffff;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+        }
+
+        .featured-desc {
+            color: #999;
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 30px;
+        }
+
+        .featured-highlights {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-top: 1px solid #333;
+            border-bottom: 1px solid #333;
+        }
+
+        .highlight-item {
+            flex: 1;
+        }
+
+        .highlight-label {
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .highlight-value {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .featured-cta {
+            display: inline-block;
+            background: #ffffff;
+            color: #000000;
+            padding: 14px 32px;
+            border: 2px solid #ffffff;
+            border-radius: 2px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .featured-cta:hover {
+            background: transparent;
+            color: #ffffff;
+        }
+
+        .featured-visual {
+            text-align: center;
+        }
+
+        .featured-icon {
+            font-size: 120px;
+            margin-bottom: 20px;
+            line-height: 1;
+        }
+
+        .featured-date {
+            color: #666;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .section-header {
             text-align: center;
             margin-bottom: 50px;
@@ -193,6 +290,20 @@
             padding: 35px 30px;
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
             border-bottom: 1px solid #333;
+            position: relative;
+        }
+
+        .platform-apy {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: #ffffff;
+            color: #000000;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
         }
 
         .platform-number {
@@ -336,6 +447,29 @@
                 padding: 40px 20px;
             }
 
+            .featured-section {
+                padding: 25px;
+                margin-bottom: 50px;
+            }
+
+            .featured-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .featured-info h2 {
+                font-size: 28px;
+            }
+
+            .featured-highlights {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .featured-icon {
+                font-size: 80px;
+            }
+
             .platforms-grid {
                 grid-template-columns: 1fr;
             }
@@ -380,6 +514,35 @@
     </div>
 
     <div class="content">
+        <div class="featured-section">
+            <div class="featured-badge">⭐ FEATURED YIELD OF THE WEEK</div>
+            <div class="featured-container">
+                <div class="featured-info">
+                    <h2>Yuzu Money</h2>
+                    <p class="featured-desc">High-yield DeFi stablecoin with institutional-grade protection. Earn competitive yields while maintaining stability and transparency.</p>
+                    <div class="featured-highlights">
+                        <div class="highlight-item">
+                            <div class="highlight-label">Est. APY</div>
+                            <div class="highlight-value">~12-15%</div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-label">Risk Level</div>
+                            <div class="highlight-value">Medium</div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-label">Type</div>
+                            <div class="highlight-value">Stablecoin</div>
+                        </div>
+                    </div>
+                    <a href="https://app.yuzu.money/?ref=WTKY8ZYN" target="_blank" class="featured-cta">Explore Yuzu Money →</a>
+                </div>
+                <div class="featured-visual">
+                    <div class="featured-icon">💰</div>
+                    <div class="featured-date">Week of Jan 27, 2026</div>
+                </div>
+            </div>
+        </div>
+
         <div class="section-header" id="platforms">
             <h2>Featured Platforms</h2>
             <p>Hand-picked DeFi protocols with proven track records</p>
@@ -388,6 +551,7 @@
         <div class="platforms-grid">
             <div class="platform-card" onclick="window.location.href='https://revert.finance/#/ref/f1xvt0__'">
                 <div class="card-header">
+                    <div class="platform-apy">12% APY</div>
                     <div class="platform-number">Platform 01</div>
                     <div class="platform-name">Revert Finance</div>
                     <div class="platform-desc">Advanced analytics and portfolio management for Uniswap V3 liquidity providers. Real-time position tracking and performance optimization tools.</div>
@@ -400,6 +564,7 @@
 
             <div class="platform-card" onclick="window.location.href='https://app.resolv.xyz/ref/brandonkz____'">
                 <div class="card-header">
+                    <div class="platform-apy">8.63% APY</div>
                     <div class="platform-number">Platform 02</div>
                     <div class="platform-name">Resolv</div>
                     <div class="platform-desc">Decentralized stablecoin protocol delivering sustainable yields through algorithmic stability mechanisms and collateral optimization.</div>
@@ -412,6 +577,7 @@
 
             <div class="platform-card" onclick="window.location.href='https://app.upshift.finance/r/Ec3600778613__'">
                 <div class="card-header">
+                    <div class="platform-apy">11% APY</div>
                     <div class="platform-number">Platform 03</div>
                     <div class="platform-name">Upshift Finance</div>
                     <div class="platform-desc">Automated yield optimization platform with intelligent leverage strategies. Maximize returns through algorithmic capital deployment.</div>
@@ -424,6 +590,7 @@
 
             <div class="platform-card" onclick="window.location.href='https://yield.accountable.capital/'">
                 <div class="card-header">
+                    <div class="platform-apy">Up to 24% APY</div>
                     <div class="platform-number">Platform 04</div>
                     <div class="platform-name">Accountable Capital</div>
                     <div class="platform-desc">Professional-grade yield management platform offering institutional-quality DeFi investment strategies and risk-adjusted returns.</div>
@@ -436,6 +603,7 @@
 
             <div class="platform-card" onclick="window.location.href='https://app.orderly.network/vaults/0x70fe7d65ac7c1a1732f64d2e6fc0e33622d0c991'">
                 <div class="card-header">
+                    <div class="platform-apy">4-30% APY</div>
                     <div class="platform-number">Platform 05</div>
                     <div class="platform-name">Orderly Network Vault</div>
                     <div class="platform-desc">Decentralized trading infrastructure with automated vault strategies. Access institutional-grade liquidity and yield generation.</div>
@@ -448,6 +616,7 @@
 
             <div class="platform-card" onclick="window.location.href='https://app.yuzu.money/?ref=WTKY8ZYN'">
                 <div class="card-header">
+                    <div class="platform-apy">11% APY</div>
                     <div class="platform-number">Platform 06</div>
                     <div class="platform-name">Yuzu Money</div>
                     <div class="platform-desc">High-yield DeFi stablecoin with institutional-grade protection. Transparent, overcollateralized, and backed by curated yield strategies.</div>
@@ -457,11 +626,24 @@
                     <button class="visit-btn" onclick="event.stopPropagation(); window.open('https://app.yuzu.money/?ref=WTKY8ZYN', '_blank')">VISIT →</button>
                 </div>
             </div>
+
+            <div class="platform-card" onclick="window.location.href='https://app.morpho.org/ethereum/vault/0xb576765fB15505433aF24FEe2c0325895C559FB2/sentora-pyusd-main'">
+                <div class="card-header">
+                    <div class="platform-apy">~10-14% APY</div>
+                    <div class="platform-number">Platform 07</div>
+                    <div class="platform-name">Morpho - Sentora PYUSD</div>
+                    <div class="platform-desc">Optimized lending protocol with automated vault strategies. Access institutional-grade PYUSD yields through Morpho's efficient lending markets.</div>
+                </div>
+                <div class="card-footer">
+                    <div class="platform-url">morpho.org</div>
+                    <button class="visit-btn" onclick="event.stopPropagation(); window.open('https://app.morpho.org/ethereum/vault/0xb576765fB15505433aF24FEe2c0325895C559FB2/sentora-pyusd-main', '_blank')">VISIT →</button>
+                </div>
+            </div>
         </div>
 
         <div class="stats-section">
             <div class="stat-card">
-                <div class="stat-number">6</div>
+                <div class="stat-number">7</div>
                 <div class="stat-label">Curated Platforms</div>
             </div>
             <div class="stat-card">

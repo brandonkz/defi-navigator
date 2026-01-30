@@ -4,15 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DeFi Yield Navigator</title>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-V8CVQMQ5FM"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-V8CVQMQ5FM');
-</script>
     <style>
         * {
             margin: 0;
@@ -98,6 +89,18 @@
             font-weight: 700;
             margin-bottom: 8px;
             letter-spacing: -1px;
+        }
+
+        .site-apy {
+            display: inline-block;
+            background: #000000;
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            margin-bottom: 12px;
         }
 
         .site-info p {
@@ -328,12 +331,13 @@
                 <span class="beta-tag">BETA</span>
             </div>
             <div class="site-counter">
-                PLATFORM <span id="currentNum">1</span> OF <span id="totalNum">6</span>
+                PLATFORM <span id="currentNum">1</span> OF <span id="totalNum">7</span>
             </div>
         </div>
         <div class="header-main">
             <div class="site-info">
                 <h1 id="headerName">Loading...</h1>
+                <div class="site-apy" id="headerApy">~0% APY</div>
                 <p id="headerDesc">Preparing your next DeFi opportunity...</p>
             </div>
             <div class="controls">
@@ -370,7 +374,7 @@
             <a href="#" onclick="return false;">PLATFORMS</a>
             <a href="https://x.com/brandonkz" target="_blank">CONTACT</a>
         </div>
-        <div class="last-updated-footer">Last Updated: January 27, 2026 • 6 Platforms</div>
+        <div class="last-updated-footer">Last Updated: January 27, 2026 • 7 Platforms</div>
         <div class="copyright">
             © 2026 DeFi Navigator. All rights reserved.
         </div>
@@ -381,32 +385,44 @@
             {
                 url: 'https://revert.finance/#/ref/f1xvt0__',
                 name: 'Revert Finance',
+                apy: '12% APY',
                 description: 'Advanced analytics and portfolio management for Uniswap V3 liquidity providers. Real-time position tracking and performance optimization tools.'
             },
             {
                 url: 'https://app.resolv.xyz/ref/brandonkz____',
                 name: 'Resolv',
+                apy: '8.63% APY',
                 description: 'Decentralized stablecoin protocol delivering sustainable yields through algorithmic stability mechanisms and collateral optimization.'
             },
             {
                 url: 'https://app.upshift.finance/r/Ec3600778613__',
                 name: 'Upshift Finance',
+                apy: '11% APY',
                 description: 'Automated yield optimization platform with intelligent leverage strategies. Maximize returns through algorithmic capital deployment.'
             },
             {
                 url: 'https://yield.accountable.capital/',
                 name: 'Accountable Capital',
+                apy: 'Up to 24% APY',
                 description: 'Professional-grade yield management platform offering institutional-quality DeFi investment strategies and risk-adjusted returns.'
             },
             {
                 url: 'https://app.orderly.network/vaults/0x70fe7d65ac7c1a1732f64d2e6fc0e33622d0c991',
                 name: 'Orderly Network Vault',
+                apy: '4-30% APY',
                 description: 'Decentralized trading infrastructure with automated vault strategies. Access institutional-grade liquidity and yield generation.'
             },
             {
                 url: 'https://app.yuzu.money/?ref=WTKY8ZYN',
                 name: 'Yuzu Money',
+                apy: '11% APY',
                 description: 'High-yield DeFi stablecoin with institutional-grade protection. Transparent, overcollateralized, and backed by curated yield strategies.'
+            },
+            {
+                url: 'https://app.morpho.org/ethereum/vault/0xb576765fB15505433aF24FEe2c0325895C559FB2/sentora-pyusd-main',
+                name: 'Morpho - Sentora PYUSD',
+                apy: '~10-14% APY',
+                description: 'Optimized lending protocol with automated vault strategies. Access institutional-grade PYUSD yields through Morpho\'s efficient lending markets.'
             }
         ];
 
@@ -416,6 +432,7 @@
         const currentNum = document.getElementById('currentNum');
         const totalNum = document.getElementById('totalNum');
         const headerName = document.getElementById('headerName');
+        const headerApy = document.getElementById('headerApy');
         const headerDesc = document.getElementById('headerDesc');
         const countdown = document.getElementById('countdown');
         const countdownText = document.getElementById('countdownText');
@@ -434,6 +451,7 @@
             const site = sites[index];
             currentNum.textContent = index + 1;
             headerName.textContent = site.name;
+            headerApy.textContent = site.apy;
             headerDesc.textContent = site.description;
             previewName.textContent = site.name;
             previewDesc.textContent = site.description;
