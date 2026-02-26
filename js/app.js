@@ -72,6 +72,9 @@ function matchPairs(orderlyRates, hyperRates) {
       const orderlyAnnual = annualizeFrom8h(orderly.rate8h);
       const hyperAnnual = annualizeFrom8h(hyper.rate8h);
       const spread = orderlyAnnual - hyperAnnual;
+      const oiOrderly = orderly.openInterest || 0;
+      const oiHyper = hyper.openInterest || 0;
+      const oiMin = Math.min(oiOrderly, oiHyper);
       return {
         asset: orderly.base,
         symbol: orderly.symbol,
@@ -79,6 +82,9 @@ function matchPairs(orderlyRates, hyperRates) {
         hyperAnnual,
         spread,
         apy: Math.abs(spread),
+        oiOrderly,
+        oiHyper,
+        oiMin,
       };
     })
     .filter(Boolean);
@@ -96,6 +102,7 @@ function renderTable(rows) {
       <td>${formatPercent(row.hyperAnnual)}</td>
       <td class="${row.spread >= 0 ? "positive" : "negative"}">${formatPercent(row.spread)}</td>
       <td>${formatPercent(row.apy)}</td>
+      <td class="oi-cell"><span class="oi-label">O:</span> ${formatCompact(row.oiOrderly)} <span class="oi-label">H:</span> ${formatCompact(row.oiHyper)}</td>
       <td><a href="${tradeUrl}" target="_blank" rel="noreferrer" class="trade-btn">Trade →</a></td>
     `;
     elements.fundingBody.appendChild(tr);
@@ -124,7 +131,7 @@ function renderTopCards(rows) {
       </div>
       <p><span class="badge direction">${direction}</span></p>
       <p>Orderly: ${formatPercent(row.orderlyAnnual)} · Hyperliquid: ${formatPercent(row.hyperAnnual)}</p>
-      <p class="neutral">$${estOn10k}/yr on $10k</p>
+      <p class="neutral">$${estOn10k}/yr on $10k · OI: ${formatCompact(row.oiMin)} (min)</p>
       <a href="${tradeUrl}" target="_blank" rel="noreferrer" class="trade-link">Trade ${row.asset} on DEX →</a>
     `;
     elements.topCards.appendChild(card);
@@ -167,6 +174,7 @@ function sortPairs(rows) {
     if (sortState.key === "orderly") return (a.orderlyAnnual - b.orderlyAnnual) * factor;
     if (sortState.key === "hyperliquid") return (a.hyperAnnual - b.hyperAnnual) * factor;
     if (sortState.key === "apy") return (a.apy - b.apy) * factor;
+    if (sortState.key === "oi") return (a.oiMin - b.oiMin) * factor;
     return (a.spread - b.spread) * factor;
   });
   return sorted;
@@ -178,6 +186,12 @@ function annualizeFrom8h(rate) {
 
 function formatPercent(value) {
   return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
+}
+
+function formatCompact(value) {
+  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `$${(value / 1_000).toFixed(0)}K`;
+  return `$${value.toFixed(0)}`;
 }
 
 refreshAll();

@@ -436,6 +436,9 @@ td .trade-btn:hover {
 .negative { color: var(--red); }
 .neutral { color: var(--muted); }
 
+.oi-cell { font-size: 0.8rem; color: var(--text-secondary); }
+.oi-label { color: var(--muted); font-size: 0.7rem; font-weight: 600; }
+
 /* ===== BADGE ===== */
 .badge {
   display: inline-block;

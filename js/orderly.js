@@ -1,16 +1,30 @@
 export async function fetchOrderlyFundingRates() {
-  const res = await fetch("https://api-evm.orderly.org/v1/public/funding_rates");
-  if (!res.ok) {
-    throw new Error("Orderly funding rates request failed");
+  const [ratesRes, futuresRes] = await Promise.all([
+    fetch("https://api-evm.orderly.org/v1/public/funding_rates"),
+    fetch("https://api-evm.orderly.org/v1/public/futures"),
+  ]);
+  if (!ratesRes.ok) throw new Error("Orderly funding rates request failed");
+  const ratesData = await ratesRes.json();
+  const list = ratesData?.data?.rows || (Array.isArray(ratesData?.data) ? ratesData.data : []);
+
+  // Get OI from futures endpoint
+  const oiMap = new Map();
+  if (futuresRes.ok) {
+    const futuresData = await futuresRes.json();
+    const futures = futuresData?.data?.rows || (Array.isArray(futuresData?.data) ? futuresData.data : []);
+    futures.forEach((f) => {
+      const sym = f.symbol || f.instrument_id || "";
+      oiMap.set(sym, getNumber(f.open_interest ?? f.openInterest ?? 0));
+    });
   }
-  const data = await res.json();
-  const list = data?.data?.rows || (Array.isArray(data?.data) ? data.data : []);
+
   return list.map((item) => {
     const symbol = item.symbol || item.instrument_id || item.market;
     return {
       symbol,
       base: normalizeOrderlySymbol(symbol),
       rate8h: getNumber(item.last_funding_rate ?? item.est_funding_rate ?? item.funding_rate ?? item.fundingRate ?? item.rate),
+      openInterest: oiMap.get(symbol) || 0,
     };
   });
 }

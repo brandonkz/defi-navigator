@@ -21,6 +21,7 @@ export function parseHyperliquidFunding(metaAndCtxs) {
       base: item?.name,
       rate8h: getNumber(ctx?.funding ?? ctx?.fundingRate ?? ctx?.fundingRatePerHour),
       markPrice: getNumber(ctx?.markPx ?? ctx?.markPrice),
+      openInterest: getNumber(ctx?.openInterest) * getNumber(ctx?.markPx ?? ctx?.markPrice),
     };
   });
 }
