@@ -458,6 +458,47 @@ td .trade-btn.hl-btn:hover {
 .oi-cell { font-size: 0.8rem; color: var(--text-secondary); }
 .oi-label { color: var(--muted); font-size: 0.7rem; font-weight: 600; }
 
+.zero-fee { 
+  color: var(--green); 
+  font-size: 0.65rem; 
+  font-weight: 700; 
+  padding: 2px 6px;
+  background: rgba(94, 234, 212, 0.08);
+  border: 1px solid rgba(94, 234, 212, 0.15);
+  border-radius: 4px;
+  margin-left: 4px;
+}
+
+.zero-fee-badge {
+  background: rgba(94, 234, 212, 0.1) !important;
+  color: var(--green) !important;
+  border-color: rgba(94, 234, 212, 0.2) !important;
+  margin-left: 6px;
+}
+
+.strategy-cell { font-size: 0.78rem; }
+.short-label { color: var(--red); font-weight: 700; font-size: 0.7rem; }
+.long-label { color: var(--green); font-weight: 700; font-size: 0.7rem; margin-left: 6px; }
+
+.rates-line { font-size: 0.78rem; color: var(--text-secondary); }
+.card-links { display: flex; gap: 12px; margin-top: 6px; }
+
+td .trade-btn.lighter-btn {
+  margin-left: 8px;
+  color: #a78bfa;
+}
+td .trade-btn.lighter-btn:hover {
+  color: #c4b5fd;
+  text-shadow: 0 0 6px rgba(167, 139, 250, 0.25);
+}
+
+.card .trade-link.lighter-link {
+  color: #a78bfa;
+}
+.card .trade-link.lighter-link:hover {
+  color: #c4b5fd;
+}
+
 /* ===== BADGE ===== */
 .badge {
   display: inline-block;

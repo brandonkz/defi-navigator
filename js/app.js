@@ -1,11 +1,14 @@
 import { fetchOrderlyFundingRates } from "./orderly.js";
 import { fetchHyperliquidMeta, parseHyperliquidFunding } from "./hyperliquid.js";
+import { fetchLighterFundingRates } from "./lighter.js";
 import { initCalculator, updateCalculatorPairs } from "./calculator.js";
-// Note: Both Orderly and Hyperliquid funding rates are per 8h interval
-// Orderly: 3 intervals/day (every 8h), Hyperliquid: 3 intervals/day (every 8h)
+
+// All three exchanges use 8h funding intervals (3x/day)
+// Lighter has ZERO trading fees — best leg for any delta-neutral pair
 
 const DEX_URL = "https://dex.defiyield.live";
 const HL_REF_URL = "https://app.hyperliquid.xyz/join/DEFIYIELD";
+const LIGHTER_URL = "https://app.lighter.xyz/trade";
 const REFRESH_MS = 60_000;
 
 const elements = {
@@ -23,10 +26,7 @@ const elements = {
   calcResults: document.getElementById("calcResults"),
 };
 
-const sortState = {
-  key: "apy",
-  dir: "desc",
-};
+const sortState = { key: "apy", dir: "desc" };
 
 initCalculator({
   pairSelect: elements.pairSelect,
@@ -41,12 +41,13 @@ setupSorting();
 async function refreshAll() {
   try {
     elements.refreshStatus.textContent = "Refreshing…";
-    const [orderlyRates, hyperMeta] = await Promise.all([
+    const [orderlyRates, hyperMeta, lighterRates] = await Promise.all([
       fetchOrderlyFundingRates(),
       fetchHyperliquidMeta(),
+      fetchLighterFundingRates(),
     ]);
     const hyperRates = parseHyperliquidFunding(hyperMeta);
-    const combined = matchPairs(orderlyRates, hyperRates);
+    const combined = buildOpportunities(orderlyRates, hyperRates, lighterRates);
     const sorted = sortPairs(combined);
 
     renderTable(sorted);
@@ -62,33 +63,65 @@ async function refreshAll() {
   }
 }
 
-function matchPairs(orderlyRates, hyperRates) {
+function buildOpportunities(orderlyRates, hyperRates, lighterRates) {
+  // Build maps by asset name
+  const orderlyMap = new Map();
+  orderlyRates.forEach((r) => orderlyMap.set(r.base, r));
   const hyperMap = new Map();
-  hyperRates.forEach((item) => hyperMap.set(item.base, item));
+  hyperRates.forEach((r) => hyperMap.set(r.base, r));
+  const lighterMap = new Map();
+  lighterRates.forEach((r) => lighterMap.set(r.base, r));
 
-  return orderlyRates
-    .map((orderly) => {
-      const hyper = hyperMap.get(orderly.base);
-      if (!hyper) return null;
-      const orderlyAnnual = annualizeFrom8h(orderly.rate8h);
-      const hyperAnnual = annualizeFrom8h(hyper.rate8h);
-      const spread = orderlyAnnual - hyperAnnual;
-      const oiOrderly = orderly.openInterest || 0;
-      const oiHyper = hyper.openInterest || 0;
-      const oiMin = Math.min(oiOrderly, oiHyper);
-      return {
-        asset: orderly.base,
-        symbol: orderly.symbol,
-        orderlyAnnual,
-        hyperAnnual,
-        spread,
-        apy: Math.abs(spread),
-        oiOrderly,
-        oiHyper,
-        oiMin,
-      };
-    })
-    .filter(Boolean);
+  // Get all unique assets present on at least 2 exchanges
+  const allAssets = new Set([
+    ...orderlyMap.keys(),
+    ...hyperMap.keys(),
+    ...lighterMap.keys(),
+  ]);
+
+  const results = [];
+
+  allAssets.forEach((asset) => {
+    const o = orderlyMap.get(asset);
+    const h = hyperMap.get(asset);
+    const l = lighterMap.get(asset);
+
+    const exchanges = [];
+    if (o) exchanges.push({ name: "Orderly", rate: o.rate8h, annual: annualizeFrom8h(o.rate8h), oi: o.openInterest || 0, symbol: o.symbol });
+    if (h) exchanges.push({ name: "Hyperliquid", rate: h.rate8h, annual: annualizeFrom8h(h.rate8h), oi: h.openInterest || 0 });
+    if (l) exchanges.push({ name: "Lighter", rate: l.rate8h, annual: annualizeFrom8h(l.rate8h), oi: 0, zeroFees: true });
+
+    if (exchanges.length < 2) return;
+
+    // Find best spread: highest rate (short) vs lowest rate (long)
+    exchanges.sort((a, b) => b.annual - a.annual);
+    const shortExchange = exchanges[0]; // highest funding = short here, collect
+    const longExchange = exchanges[exchanges.length - 1]; // lowest = long here
+
+    const spread = shortExchange.annual - longExchange.annual;
+    if (Math.abs(spread) < 0.5) return; // skip tiny spreads
+
+    const oiMin = Math.min(
+      ...exchanges.filter((e) => e.oi > 0).map((e) => e.oi),
+      Infinity
+    );
+
+    results.push({
+      asset,
+      symbol: o?.symbol || `PERP_${asset}_USDC`,
+      exchanges,
+      shortExchange,
+      longExchange,
+      spread,
+      apy: Math.abs(spread),
+      oiMin: oiMin === Infinity ? 0 : oiMin,
+      orderlyAnnual: o ? annualizeFrom8h(o.rate8h) : null,
+      hyperAnnual: h ? annualizeFrom8h(h.rate8h) : null,
+      lighterAnnual: l ? annualizeFrom8h(l.rate8h) : null,
+    });
+  });
+
+  return results;
 }
 
 function renderTable(rows) {
@@ -97,16 +130,23 @@ function renderTable(rows) {
     const tr = document.createElement("tr");
     tr.className = "refresh-animate";
     const tradeUrl = `${DEX_URL}/perp/${row.symbol}`;
+    const feeNote = row.shortExchange.zeroFees || row.longExchange.zeroFees ? ' <span class="zero-fee">0% FEE</span>' : "";
+
     tr.innerHTML = `
       <td><strong>${row.asset}</strong></td>
-      <td>${formatPercent(row.orderlyAnnual)}</td>
-      <td>${formatPercent(row.hyperAnnual)}</td>
-      <td class="${row.spread >= 0 ? "positive" : "negative"}">${formatPercent(row.spread)}</td>
-      <td>${formatPercent(row.apy)}</td>
-      <td class="oi-cell"><span class="oi-label">O:</span> ${formatCompact(row.oiOrderly)} <span class="oi-label">H:</span> ${formatCompact(row.oiHyper)}</td>
+      <td>${row.orderlyAnnual !== null ? formatPercent(row.orderlyAnnual) : '<span class="neutral">—</span>'}</td>
+      <td>${row.hyperAnnual !== null ? formatPercent(row.hyperAnnual) : '<span class="neutral">—</span>'}</td>
+      <td>${row.lighterAnnual !== null ? formatPercent(row.lighterAnnual) : '<span class="neutral">—</span>'}</td>
+      <td class="${row.spread >= 0 ? "positive" : "negative"}">${formatPercent(row.apy)}${feeNote}</td>
+      <td class="strategy-cell">
+        <span class="short-label">S</span> ${row.shortExchange.name}
+        <span class="long-label">L</span> ${row.longExchange.name}
+      </td>
+      <td class="oi-cell">${row.oiMin > 0 ? formatCompact(row.oiMin) : '<span class="neutral">—</span>'}</td>
       <td>
-        <a href="${tradeUrl}" target="_blank" rel="noreferrer" class="trade-btn">Orderly</a>
+        ${row.orderlyAnnual !== null ? `<a href="${tradeUrl}" target="_blank" rel="noreferrer" class="trade-btn">O</a>` : ""}
         <a href="${HL_REF_URL}" target="_blank" rel="noreferrer" class="trade-btn hl-btn">HL</a>
+        <a href="${LIGHTER_URL}/${row.asset}" target="_blank" rel="noreferrer" class="trade-btn lighter-btn">L</a>
       </td>
     `;
     elements.fundingBody.appendChild(tr);
@@ -116,28 +156,34 @@ function renderTable(rows) {
 function renderTopCards(rows) {
   elements.topCards.innerHTML = "";
   const top = [...rows]
-    .sort((a, b) => Math.abs(b.spread) - Math.abs(a.spread))
+    .sort((a, b) => b.apy - a.apy)
     .slice(0, 5);
 
   top.forEach((row) => {
     const card = document.createElement("div");
     card.className = "card refresh-animate";
-    const direction = row.spread >= 0
-      ? "Short Orderly · Long Hyperliquid"
-      : "Short Hyperliquid · Long Orderly";
     const estOn10k = (10_000 * (row.apy / 100)).toFixed(0);
     const tradeUrl = `${DEX_URL}/perp/${row.symbol}`;
+    const hasFreeleg = row.shortExchange.zeroFees || row.longExchange.zeroFees;
 
     card.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center">
         <h3>${row.asset}</h3>
         <span class="badge">${formatPercent(row.apy)} APY</span>
       </div>
-      <p><span class="badge direction">${direction}</span></p>
-      <p>Orderly: ${formatPercent(row.orderlyAnnual)} · Hyperliquid: ${formatPercent(row.hyperAnnual)}</p>
-      <p class="neutral">$${estOn10k}/yr on $10k · OI: ${formatCompact(row.oiMin)} (min)</p>
-      <a href="${tradeUrl}" target="_blank" rel="noreferrer" class="trade-link">Orderly DEX →</a>
-      <a href="${HL_REF_URL}" target="_blank" rel="noreferrer" class="trade-link hl-link">Hyperliquid →</a>
+      <p>
+        <span class="badge direction">Short ${row.shortExchange.name} · Long ${row.longExchange.name}</span>
+        ${hasFreeleg ? '<span class="badge zero-fee-badge">0% FEE LEG</span>' : ""}
+      </p>
+      <p class="rates-line">
+        ${row.exchanges.map((e) => `${e.name}: ${formatPercent(e.annual)}`).join(" · ")}
+      </p>
+      <p class="neutral">$${estOn10k}/yr on $10k${row.oiMin > 0 ? ` · OI: ${formatCompact(row.oiMin)}` : ""}</p>
+      <div class="card-links">
+        <a href="${tradeUrl}" target="_blank" rel="noreferrer" class="trade-link">Orderly →</a>
+        <a href="${HL_REF_URL}" target="_blank" rel="noreferrer" class="trade-link hl-link">Hyperliquid →</a>
+        <a href="${LIGHTER_URL}/${row.asset}" target="_blank" rel="noreferrer" class="trade-link lighter-link">Lighter →</a>
+      </div>
     `;
     elements.topCards.appendChild(card);
   });
@@ -149,10 +195,8 @@ function updateSummary(rows) {
     elements.bestSpread.textContent = "—";
     return;
   }
-  const best = rows.reduce((acc, item) =>
-    Math.abs(item.spread) > Math.abs(acc.spread) ? item : acc
-  );
-  elements.bestSpread.textContent = `${best.asset} ${formatPercent(best.spread)}`;
+  const best = rows.reduce((acc, item) => item.apy > acc.apy ? item : acc);
+  elements.bestSpread.textContent = `${best.asset} ${formatPercent(best.apy)}`;
 }
 
 function setupSorting() {
@@ -168,7 +212,6 @@ function setupSorting() {
       refreshAll();
     });
   });
-
   elements.refreshBtn.addEventListener("click", refreshAll);
 }
 
@@ -176,8 +219,9 @@ function sortPairs(rows) {
   const sorted = [...rows];
   const factor = sortState.dir === "asc" ? 1 : -1;
   sorted.sort((a, b) => {
-    if (sortState.key === "orderly") return (a.orderlyAnnual - b.orderlyAnnual) * factor;
-    if (sortState.key === "hyperliquid") return (a.hyperAnnual - b.hyperAnnual) * factor;
+    if (sortState.key === "orderly") return ((a.orderlyAnnual || 0) - (b.orderlyAnnual || 0)) * factor;
+    if (sortState.key === "hyperliquid") return ((a.hyperAnnual || 0) - (b.hyperAnnual || 0)) * factor;
+    if (sortState.key === "lighter") return ((a.lighterAnnual || 0) - (b.lighterAnnual || 0)) * factor;
     if (sortState.key === "apy") return (a.apy - b.apy) * factor;
     if (sortState.key === "oi") return (a.oiMin - b.oiMin) * factor;
     return (a.spread - b.spread) * factor;
