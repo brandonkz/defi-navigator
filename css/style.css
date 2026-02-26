@@ -330,6 +330,15 @@ body {
   text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
 }
 
+.card .trade-link.hl-link {
+  margin-left: 12px;
+  color: var(--green);
+}
+
+.card .trade-link.hl-link:hover {
+  color: #7df5d4;
+}
+
 /* ===== SECTIONS ===== */
 .section {
   display: flex;
@@ -430,6 +439,16 @@ td .trade-btn {
 td .trade-btn:hover {
   color: var(--gold-light);
   text-shadow: 0 0 6px rgba(255, 215, 0, 0.25);
+}
+
+td .trade-btn.hl-btn {
+  margin-left: 8px;
+  color: var(--green);
+}
+
+td .trade-btn.hl-btn:hover {
+  color: #7df5d4;
+  text-shadow: 0 0 6px rgba(94, 234, 212, 0.25);
 }
 
 .positive { color: var(--green); }

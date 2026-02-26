@@ -5,6 +5,7 @@ import { initCalculator, updateCalculatorPairs } from "./calculator.js";
 // Orderly: 3 intervals/day (every 8h), Hyperliquid: 3 intervals/day (every 8h)
 
 const DEX_URL = "https://dex.defiyield.live";
+const HL_REF_URL = "https://app.hyperliquid.xyz/join/DEFIYIELD";
 const REFRESH_MS = 60_000;
 
 const elements = {
@@ -103,7 +104,10 @@ function renderTable(rows) {
       <td class="${row.spread >= 0 ? "positive" : "negative"}">${formatPercent(row.spread)}</td>
       <td>${formatPercent(row.apy)}</td>
       <td class="oi-cell"><span class="oi-label">O:</span> ${formatCompact(row.oiOrderly)} <span class="oi-label">H:</span> ${formatCompact(row.oiHyper)}</td>
-      <td><a href="${tradeUrl}" target="_blank" rel="noreferrer" class="trade-btn">Trade →</a></td>
+      <td>
+        <a href="${tradeUrl}" target="_blank" rel="noreferrer" class="trade-btn">Orderly</a>
+        <a href="${HL_REF_URL}" target="_blank" rel="noreferrer" class="trade-btn hl-btn">HL</a>
+      </td>
     `;
     elements.fundingBody.appendChild(tr);
   });
@@ -132,7 +136,8 @@ function renderTopCards(rows) {
       <p><span class="badge direction">${direction}</span></p>
       <p>Orderly: ${formatPercent(row.orderlyAnnual)} · Hyperliquid: ${formatPercent(row.hyperAnnual)}</p>
       <p class="neutral">$${estOn10k}/yr on $10k · OI: ${formatCompact(row.oiMin)} (min)</p>
-      <a href="${tradeUrl}" target="_blank" rel="noreferrer" class="trade-link">Trade ${row.asset} on DEX →</a>
+      <a href="${tradeUrl}" target="_blank" rel="noreferrer" class="trade-link">Orderly DEX →</a>
+      <a href="${HL_REF_URL}" target="_blank" rel="noreferrer" class="trade-link hl-link">Hyperliquid →</a>
     `;
     elements.topCards.appendChild(card);
   });
