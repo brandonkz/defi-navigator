@@ -4,25 +4,27 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DeFi Yield — Delta Neutral Hub</title>
+    <meta name="description" content="Scan funding rate spreads across Orderly and Hyperliquid. Find the best delta-neutral opportunities in real time." />
+    <link rel="icon" type="image/webp" href="favicon.webp" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div class="bg-glow"></div>
     <header class="site-header">
-      <div class="logo">DeFi Yield</div>
+      <a href="/" class="logo">
+        <img src="logo.webp" alt="DeFi Yield" />
+        <span class="logo-text">DeFi Yield</span>
+      </a>
       <nav class="nav-links">
         <a href="#dashboard">Dashboard</a>
         <a href="/yields.html">Yields</a>
         <a href="https://dex.defiyield.live" target="_blank" rel="noreferrer">DEX</a>
         <a href="/warroom.html">War Room</a>
       </nav>
-      <button id="connectBtn" class="btn ghost">Connect</button>
+      <a href="https://dex.defiyield.live" target="_blank" rel="noreferrer" class="btn">Start Trading</a>
     </header>
 
     <main id="dashboard" class="container">
@@ -31,8 +33,7 @@
           <p class="eyebrow">Funding Rate Scanner</p>
           <h1>Delta Neutral Hub</h1>
           <p class="subtext">
-            Scan Orderly and Hyperliquid in real time to capture market-neutral
-            funding spreads.
+            Scan Orderly and Hyperliquid in real time. Find the highest funding rate spreads, estimate your APY, and trade directly on our DEX.
           </p>
           <div class="hero-stats">
             <div class="stat">
@@ -48,18 +49,23 @@
               <span id="lastRefresh" class="value">—</span>
             </div>
           </div>
+          <div class="hero-cta">
+            <a href="https://dex.defiyield.live" target="_blank" rel="noreferrer" class="btn">Trade on DEX →</a>
+          </div>
         </div>
         <div class="hero-panel">
-          <h2>Top 5 Opportunities</h2>
+          <h2>🏆 Top 5 Opportunities</h2>
           <div id="topCards" class="cards"></div>
         </div>
       </section>
+
+      <div class="gold-line"></div>
 
       <section class="section">
         <div class="section-header">
           <h2>Funding Rate Scanner</h2>
           <div class="actions">
-            <button id="refreshBtn" class="btn">Refresh Now</button>
+            <button id="refreshBtn" class="btn ghost btn-sm">↻ Refresh</button>
             <span id="refreshStatus" class="status">Auto-refresh: 60s</span>
           </div>
         </div>
@@ -68,10 +74,11 @@
             <thead>
               <tr>
                 <th>Asset</th>
-                <th data-sort="orderly">Orderly Rate (8h annualized)</th>
-                <th data-sort="hyperliquid">Hyperliquid Rate (8h annualized)</th>
+                <th data-sort="orderly">Orderly Rate (Ann.)</th>
+                <th data-sort="hyperliquid">Hyperliquid Rate (Ann.)</th>
                 <th data-sort="spread">Spread</th>
                 <th data-sort="apy">Est. APY</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody id="fundingBody"></tbody>
@@ -79,37 +86,16 @@
         </div>
       </section>
 
-      <section class="section">
-        <div class="section-header">
-          <h2>Position Monitor</h2>
-          <span class="status">Connected accounts only. Data stays in your browser.</span>
-        </div>
-        <div class="positions">
-          <div class="positions-grid">
-            <div class="card">
-              <h3>Orderly Positions</h3>
-              <div id="orderlyPositions" class="positions-list empty">Connect to load positions.</div>
-            </div>
-            <div class="card">
-              <h3>Hyperliquid Positions</h3>
-              <div id="hyperliquidPositions" class="positions-list empty">Connect to load positions.</div>
-            </div>
-          </div>
-          <div class="card summary-card">
-            <h3>Combined View</h3>
-            <div id="combinedPositions" class="positions-list empty">Awaiting account data.</div>
-          </div>
-        </div>
-      </section>
+      <div class="gold-line"></div>
 
       <section class="section">
         <div class="section-header">
           <h2>APY Calculator</h2>
-          <span class="status">Estimate earnings after fees.</span>
+          <span class="status">Estimate earnings after trading fees</span>
         </div>
-        <div class="calculator card">
+        <div class="calculator">
           <div class="field">
-            <label for="capitalInput">Capital</label>
+            <label for="capitalInput">Capital ($)</label>
             <input id="capitalInput" type="number" value="10000" min="0" step="100" />
           </div>
           <div class="field">
@@ -129,50 +115,13 @@
       </section>
     </main>
 
-    <footer id="docs" class="site-footer">
-      <span>DeFi Yield — Delta Neutral Hub</span>
+    <footer class="site-footer">
+      <span>© 2026 DeFi Yield</span>
       <div class="footer-links">
-        <a href="https://defiyield.live" target="_blank" rel="noreferrer">defiyield.live</a>
+        <a href="https://defiyield.live">defiyield.live</a>
         <a href="https://dex.defiyield.live" target="_blank" rel="noreferrer">dex.defiyield.live</a>
       </div>
     </footer>
-
-    <div id="modal" class="modal hidden">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Connect Accounts</h2>
-          <button id="closeModal" class="btn ghost">Close</button>
-        </div>
-        <div class="modal-body">
-          <div class="modal-section">
-            <h3>Orderly API</h3>
-            <div class="field">
-              <label for="orderlyKey">API Key</label>
-              <input id="orderlyKey" type="text" placeholder="Enter Orderly API key" />
-            </div>
-            <div class="field">
-              <label for="orderlySecret">API Secret</label>
-              <input id="orderlySecret" type="password" placeholder="Enter Orderly API secret" />
-            </div>
-            <div class="field">
-              <label for="orderlyPassphrase">Passphrase</label>
-              <input id="orderlyPassphrase" type="password" placeholder="Enter passphrase" />
-            </div>
-          </div>
-          <div class="modal-section">
-            <h3>Hyperliquid</h3>
-            <div class="field">
-              <label for="hyperAddress">Wallet Address</label>
-              <input id="hyperAddress" type="text" placeholder="0x..." />
-            </div>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button id="saveKeys" class="btn">Save</button>
-          <button id="clearKeys" class="btn ghost">Clear</button>
-        </div>
-      </div>
-    </div>
 
     <script type="module" src="js/app.js"></script>
   </body>
