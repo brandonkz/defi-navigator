@@ -19,7 +19,7 @@ export function parseHyperliquidFunding(metaAndCtxs) {
     return {
       symbol: item?.name,
       base: item?.name,
-      rateHourly: getNumber(ctx?.funding ?? ctx?.fundingRate ?? ctx?.fundingRatePerHour),
+      rate8h: getNumber(ctx?.funding ?? ctx?.fundingRate ?? ctx?.fundingRatePerHour),
       markPrice: getNumber(ctx?.markPx ?? ctx?.markPrice),
     };
   });

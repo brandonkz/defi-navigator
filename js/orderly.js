@@ -1,5 +1,8 @@
+const CORS_PROXY = "https://corsproxy.io/?";
+
 export async function fetchOrderlyFundingRates() {
-  const res = await fetch("https://api-evm.orderly.org/v1/public/funding_rates");
+  const url = "https://api-evm.orderly.org/v1/public/funding_rates";
+  const res = await fetch(CORS_PROXY + encodeURIComponent(url));
   if (!res.ok) {
     throw new Error("Orderly funding rates request failed");
   }
@@ -16,7 +19,7 @@ export async function fetchOrderlyFundingRates() {
 }
 
 export async function fetchOrderlyInfo() {
-  const res = await fetch("https://api-evm.orderly.org/v1/public/info");
+  const res = await fetch(CORS_PROXY + encodeURIComponent("https://api-evm.orderly.org/v1/public/info"));
   if (!res.ok) {
     throw new Error("Orderly info request failed");
   }
@@ -24,7 +27,7 @@ export async function fetchOrderlyInfo() {
 }
 
 export async function fetchOrderlyFutures() {
-  const res = await fetch("https://api-evm.orderly.org/v1/public/futures");
+  const res = await fetch(CORS_PROXY + encodeURIComponent("https://api-evm.orderly.org/v1/public/futures"));
   if (!res.ok) {
     throw new Error("Orderly futures request failed");
   }

@@ -67,9 +67,11 @@ function getStoredKeys() {
   }
 }
 
+const CORS_PROXY = "https://corsproxy.io/?";
+
 async function fetchOrderlyPositions(keys) {
   if (!keys.orderlyKey || !keys.orderlySecret) return null;
-  const res = await fetch("https://api-evm.orderly.org/v1/positions", {
+  const res = await fetch(CORS_PROXY + encodeURIComponent("https://api-evm.orderly.org/v1/positions"), {
     headers: {
       "orderly-key": keys.orderlyKey,
       "orderly-secret": keys.orderlySecret,

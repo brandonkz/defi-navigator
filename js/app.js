@@ -1,5 +1,7 @@
 import { fetchOrderlyFundingRates } from "./orderly.js";
 import { fetchHyperliquidMeta, parseHyperliquidFunding } from "./hyperliquid.js";
+// Note: Both Orderly and Hyperliquid funding rates are per 8h interval
+// Orderly: 3 intervals/day (every 8h), Hyperliquid: 3 intervals/day (every 8h)
 import { initPositionMonitor, loadPositions } from "./positions.js";
 import { initCalculator, updateCalculatorPairs } from "./calculator.js";
 
@@ -85,7 +87,7 @@ function matchPairs(orderlyRates, hyperRates) {
       const hyper = hyperMap.get(orderly.base);
       if (!hyper) return null;
       const orderlyAnnual = annualizeFrom8h(orderly.rate8h);
-      const hyperAnnual = annualizeFromHourly(hyper.rateHourly);
+      const hyperAnnual = annualizeFrom8h(hyper.rate8h);
       const spread = orderlyAnnual - hyperAnnual;
       return {
         asset: orderly.base,
@@ -225,9 +227,6 @@ function annualizeFrom8h(rate) {
   return rate * 3 * 365 * 100;
 }
 
-function annualizeFromHourly(rate) {
-  return rate * 8 * 3 * 365 * 100;
-}
 
 function formatPercent(value) {
   return `${value.toFixed(2)}%`;
