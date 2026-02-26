@@ -8,7 +8,7 @@ import { initCalculator, updateCalculatorPairs } from "./calculator.js";
 const TRADE_URLS = {
   Orderly: (symbol) => `https://dex.defiyield.live/perp/${symbol}`,
   Hyperliquid: () => "https://app.hyperliquid.xyz/join/DEFIYIELD",
-  Lighter: (asset) => `https://app.lighter.xyz/trade/${asset}`,
+  Lighter: (asset) => `https://app.lighter.xyz/trade/${asset}?referral=WWYWM1B1P19D`,
   Binance: (asset) => `https://www.binance.com/en/futures/${asset}USDT`,
   Bybit: (asset) => `https://www.bybit.com/trade/usdt/${asset}USDT`,
 };
