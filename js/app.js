@@ -62,7 +62,7 @@ async function refreshAll() {
     const [orderlyRates, allRates, extendedRates] = await Promise.all([
       fetchOrderlyFundingRates(),
       fetchAllFundingRates(),
-      Extended.getFundingRates(),
+      Extended.getFundingRates().catch(() => ({})),
     ]);
 
     // Build unified map: exchange -> asset -> rate data
