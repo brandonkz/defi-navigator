@@ -6,7 +6,7 @@ import { initCalculator, updateCalculatorPairs } from "./calculator.js";
 // Lighter = zero fees, CEXs shown for reference
 
 const TRADE_URLS = {
-  Orderly: (symbol) => `https://dex.defiyield.live/perp/${symbol}`,
+  Orderly: (symbol) => `https://dex.defiyield.live/perp/${symbol}?broker_id=defi_yield`,
   Hyperliquid: () => "https://app.hyperliquid.xyz/join/DEFIYIELD",
   Lighter: (asset) => `https://app.lighter.xyz/trade/${asset}?referral=WWYWM1B1P19D`,
   Binance: (asset) => `https://www.binance.com/en/futures/${asset}USDT`,
