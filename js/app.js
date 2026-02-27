@@ -1,7 +1,6 @@
 import { fetchOrderlyFundingRates } from "./orderly.js";
 import { fetchAllFundingRates } from "./lighter.js";
 import { initCalculator, updateCalculatorPairs } from "./calculator.js";
-import { Extended } from "./extended.js";
 
 // All exchanges use 8h funding intervals
 // Lighter = zero fees, CEXs shown for reference
@@ -10,21 +9,19 @@ const TRADE_URLS = {
   Orderly: (symbol) => `https://dex.defiyield.live/perp/${symbol}`,
   Hyperliquid: () => "https://app.hyperliquid.xyz/join/DEFIYIELD",
   Lighter: (asset) => `https://app.lighter.xyz/trade/${asset}?referral=WWYWM1B1P19D`,
-  Extended: (asset) => `https://extended.exchange/trade/${asset}-USD`,
   Binance: (asset) => `https://www.binance.com/en/futures/${asset}USDT`,
   Bybit: (asset) => `https://www.bybit.com/trade/usdt/${asset}USDT`,
 };
 
 const EXCHANGE_META = {
-  Orderly:    { color: "gold",   label: "O",   css: "orderly-btn",  fees: "~0.04%", type: "DEX" },
-  Hyperliquid:{ color: "teal",   label: "HL",  css: "hl-btn",       fees: "~0.04%", type: "DEX" },
-  Lighter:    { color: "purple", label: "L",   css: "lighter-btn",  fees: "0%",     type: "DEX" },
-  Extended:   { color: "blue",   label: "EX",  css: "extended-btn", fees: "~0.02%", type: "DEX" },
-  Binance:    { color: "yellow", label: "B",   css: "binance-btn",  fees: "~0.02%", type: "CEX" },
-  Bybit:      { color: "orange", label: "By",  css: "bybit-btn",    fees: "~0.04%", type: "CEX" },
+  Orderly:     { color: "gold",   label: "O",  css: "orderly-btn",  fees: "~0.04%", type: "DEX" },
+  Hyperliquid: { color: "teal",   label: "HL", css: "hl-btn",       fees: "~0.04%", type: "DEX" },
+  Lighter:     { color: "purple", label: "L",  css: "lighter-btn",  fees: "0%",     type: "DEX" },
+  Binance:     { color: "yellow", label: "B",  css: "binance-btn",  fees: "~0.02%", type: "CEX" },
+  Bybit:       { color: "orange", label: "By", css: "bybit-btn",    fees: "~0.04%", type: "CEX" },
 };
 
-const EXCHANGE_ORDER = ["Orderly", "Hyperliquid", "Lighter", "Extended", "Binance", "Bybit"];
+const EXCHANGE_ORDER = ["Orderly", "Hyperliquid", "Lighter", "Binance", "Bybit"];
 const REFRESH_MS = 60_000;
 
 const elements = {
@@ -59,10 +56,9 @@ async function refreshAll() {
     elements.refreshStatus.textContent = "Refreshing\u2026";
 
     // Fetch Orderly directly (not in Lighter's aggregator) + all from Lighter API + Extended
-    const [orderlyRates, allRates, extendedRates] = await Promise.all([
+    const [orderlyRates, allRates] = await Promise.all([
       fetchOrderlyFundingRates(),
       fetchAllFundingRates(),
-      Extended.getFundingRates().catch(() => ({})),
     ]);
 
     // Build unified map: exchange -> asset -> rate data
@@ -79,17 +75,7 @@ async function refreshAll() {
     if (allRates.binance) unified["Binance"] = allRates.binance;
     if (allRates.bybit) unified["Bybit"] = allRates.bybit;
 
-    // Extended (Starknet hybrid CLOB)
-    const extendedMap = new Map();
-    Object.entries(extendedRates).forEach(([asset, data]) => {
-      extendedMap.set(asset, {
-        base: asset,
-        symbol: data.symbol,
-        rate8h: data.rate8h,
-        openInterest: data.openInterest,
-      });
-    });
-    if (extendedMap.size > 0) unified["Extended"] = extendedMap;
+
 
     const combined = buildOpportunities(unified);
     const sorted = sortPairs(combined);
